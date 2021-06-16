@@ -16,6 +16,8 @@ df_objectives <- df %>%
          distance_neg = -pair_align_score) %>%
   select(probability_inv, distance_neg) #%>% head() 
 
+View(df)
+
 
 # First pareto front
 ####################

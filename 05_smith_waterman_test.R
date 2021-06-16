@@ -40,6 +40,8 @@ s2 <- AAString("PKYVKQNTLKLATGMRNVPEKQT") #EYEEDRGKGFFPQTITQEYE")
 #pairwiseAlignment(s1, s2, substitutionMatrix = "BLOSUM50", gapOpening = 3, gapExtension = 1)
 
 #pairwiseAlignment(s1, s2, substitutionMatrix = "BLOSUM45", gapOpening = 3, gapExtension = 1)
+#pairwiseAlignment(s1, s2, substitutionMatrix = "BLOSUM50", gapOpening = 3, gapExtension = 1)
+#pairwiseAlignment(s1, s2, substitutionMatrix = "BLOSUM62", gapOpening = 3, gapExtension = 1)
 #pairwiseAlignment(s1, s2, substitutionMatrix = "BLOSUM80", gapOpening = 3, gapExtension = 1)
 #pairwiseAlignment(s1, s2, substitutionMatrix = "BLOSUM100", gapOpening = 3, gapExtension = 1)
 #pairwiseAlignment(s1, s2, substitutionMatrix = "PAM30", gapOpening = 3, gapExtension = 1)
