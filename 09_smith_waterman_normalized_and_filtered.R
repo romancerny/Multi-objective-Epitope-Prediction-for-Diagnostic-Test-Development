@@ -26,8 +26,8 @@ head(peptides_no_Ov)
 # ,'PAM250' 
 
 #substitution_matrices <- c('PAM30', 'BLOSUM45')
-#substitution_matrices <- c('PAM30')
-substitution_matrices <- c('PAM30','BLOSUM45' ,'PAM40','BLOSUM50' ,'PAM70','BLOSUM62' ,'PAM120','BLOSUM80' ,'PAM250','BLOSUM100')
+substitution_matrices <- c('PAM30')
+#substitution_matrices <- c('PAM30','BLOSUM45' ,'PAM40','BLOSUM50' ,'PAM70','BLOSUM62' ,'PAM120','BLOSUM80' ,'PAM250','BLOSUM100')
 
 gap_opening <- 3
 gap_extension <- 1
