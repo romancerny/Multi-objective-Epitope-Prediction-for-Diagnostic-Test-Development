@@ -4,7 +4,8 @@ require("mco")
 require("ggplot2")
 library("plotly")
 
-file_name <- './data/predictions_smith_waterman_PAM30_2021-06-16_23_18_07.csv'
+PLOT_SEQUENCE <- FALSE
+file_name <- './data/predictions_pairwiseAlignment_PAM30_local_2021-07-05_16_47_49.csv'
                 
 df <- read.csv(file=file_name)
 
@@ -24,11 +25,19 @@ rank <- nds_rank(m_objectives) #, partial)
 
 file_name_split <- unlist(strsplit(file_name, '_'))
 
-pl <- ggplot(data=df_complemented_negated, aes(x=probability_complement, y=distance_neg)) +
-  ggtitle("PAM30") +
-  geom_point(aes(text=sprintf("Protein ID: %s Sequence: %s<br>Info_PepID: %s Info_peptide: %s", 
-                              Protein, Sequence, 
-                              Info_PepID, Info_peptide)))
+if (PLOT_SEQUENCE) {
+  pl <- ggplot(data=df_complemented_negated, aes(x=probability_complement, y=distance_neg)) +
+    ggtitle("PAM30") +
+    geom_point(aes(text=sprintf("Protein ID: %s Sequence: %s<br>Info_PepID: %s Info_peptide: %s", 
+                                Protein, Sequence, 
+                                Info_PepID, Info_peptide)))
+} else {
+  pl <- ggplot(data=df_complemented_negated, aes(x=probability_complement, y=distance_neg)) +
+    ggtitle("PAM30") +
+    geom_point(aes(text=sprintf("Protein ID: %s <br>Info_PepID: %s", 
+                                Protein, 
+                                Info_PepID)))
+}
 
 # Plot Pareto fronts
 for (idx in 1:max(rank)) {

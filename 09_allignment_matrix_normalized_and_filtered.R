@@ -29,8 +29,10 @@ head(peptides_no_Ov)
 substitution_matrices <- c('PAM30')
 #substitution_matrices <- c('PAM30','BLOSUM45' ,'PAM40','BLOSUM50' ,'PAM70','BLOSUM62' ,'PAM120','BLOSUM80' ,'PAM250','BLOSUM100')
 
-gap_opening <- 3
-gap_extension <- 1
+#pairwise_align_type <- "overlap"
+pairwise_align_type <- "local"
+gap_opening <- 5
+gap_extension <- 2
 
 cores <- detectCores()
 
@@ -38,6 +40,7 @@ for (substitution_matrix in substitution_matrices) {
   cl <- makeCluster(cores-1)
   parallel::clusterExport(cl= cl, varlist = c("Ov_predictions", 
                                               "peptides_no_Ov",
+                                              "pairwise_align_type",
                                               "gap_opening",
                                               "gap_extension",
                                               "substitution_matrix"))
@@ -66,7 +69,7 @@ for (substitution_matrix in substitution_matrices) {
                           info_peptide <- peptides_no_Ov[peptide_idx, 'Info_peptide']
                           
                           pair_align = pairwiseAlignment(sequence, info_peptide,
-                                                         type = "overlap",
+                                                         type = pairwise_align_type,
                                                          substitutionMatrix = substitution_matrix, 
                                                          gapOpening = gap_opening, 
                                                          gapExtension = gap_extension)
@@ -134,7 +137,7 @@ for (substitution_matrix in substitution_matrices) {
     
     print("Writing result to the file...")
     
-    output_file_name <- paste('./output/predictions_smith_waterman_', substitution_matrix, '_', Sys.time(), sep='')
+    output_file_name <- paste('./output/predictions_pairwiseAlignment_', substitution_matrix, '_', pairwise_align_type, '_', Sys.time(), sep='')
     output_file_name <- gsub(' ', '_', output_file_name, fixed = TRUE)
     output_file_name <- gsub(':', '_', output_file_name, fixed = TRUE)
     
