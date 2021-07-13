@@ -37,40 +37,50 @@ organisms_data <- list(
 )
 
 
+# Algorithm params
+##################
+
+substitution_matrices <- c('PAM30')
+pairwise_align_type <- 'overlap'
+gap_opening <- 5
+gap_extension <- 2
+
+
 for (organism_data in organisms_data) {
 
   # Calculating alignment scores
   ##############################
   
-  #organism_predictions <- read.csv(file=organism_data[2])
-  #peptides_excl_organism <- read.csv(file=organism_data[3])
-  organism_predictions <- readRDS(file=organism_data[2]) %>% head() ##############################
-  peptides_excl_organism <- readRDS(file=organism_data[3]) %>% head() ############################
+  organism_predictions <- readRDS(file=organism_data[2])
+  peptides_excl_organism <- readRDS(file=organism_data[3])
   
-  # algorithm params
-  substitution_matrices <- c('PAM30')
-  pairwise_align_type <- 'overlap'
-  gap_opening <- 5
-  gap_extension <- 2
-  
+  # normalize column names
+  colnames(organism_predictions) <- c('Protein', 
+                                      'Start_pos', 
+                                      'End_pos', 
+                                      'Length', 
+                                      'Probability', 
+                                      'Sequence', 
+                                      'CandidateID')
+
   cores <- detectCores()
   
   for (substitution_matrix in substitution_matrices) {
     cl <- makeCluster(cores-1)
-    parallel::clusterExport(cl= cl, varlist = c("organism_predictions", 
-                                                "peptides_excl_organism",
-                                                "pairwise_align_type",
-                                                "gap_opening",
-                                                "gap_extension",
-                                                "substitution_matrix"))
+    parallel::clusterExport(cl=cl, varlist=c('organism_predictions', 
+                                              'peptides_excl_organism',
+                                              'pairwise_align_type',
+                                              'gap_opening',
+                                              'gap_extension',
+                                              'substitution_matrix'))
     
-    parallel::clusterEvalQ(cl= cl, library(Biostrings))
+    parallel::clusterEvalQ(cl=cl, library(Biostrings))
     
     system.time({
       
-      result = pblapply(cl = cl,
-                        X = 1:nrow(organism_predictions),
-                        FUN = function(idx) {
+      result = pblapply(cl=cl,
+                        X=1:nrow(organism_predictions),
+                        FUN=function(idx) {
                           protein <- organism_predictions[idx, 'Protein']
                           start_pos <- organism_predictions[idx, 'Start_pos']
                           end_pos <- organism_predictions[idx, 'End_pos']
@@ -78,7 +88,7 @@ for (organism_data in organisms_data) {
                           probability <- organism_predictions[idx, 'Probability']
                           sequence <- organism_predictions[idx, 'Sequence']
                           
-                          result_all = as.data.frame(matrix(nrow=nrow(peptides_excl_organism), ncol=9))
+                          result_all <- as.data.frame(matrix(nrow=nrow(peptides_excl_organism), ncol=9))
                           
                           max_similarity_score <- 0
                           len_of_max_similarity_score_peptide_string <- 0
@@ -88,10 +98,10 @@ for (organism_data in organisms_data) {
                             info_peptide <- peptides_excl_organism[peptide_idx, 'Info_peptide']
                             
                             pair_align = pairwiseAlignment(sequence, info_peptide,
-                                                           type = pairwise_align_type,
-                                                           substitutionMatrix = substitution_matrix, 
-                                                           gapOpening = gap_opening, 
-                                                           gapExtension = gap_extension)
+                                                           type=pairwise_align_type,
+                                                           substitutionMatrix=substitution_matrix, 
+                                                           gapOpening=gap_opening, 
+                                                           gapExtension=gap_extension)
                             
                             score <- pair_align@score 
                             
@@ -141,32 +151,32 @@ for (organism_data in organisms_data) {
                           return(result)
                         })
       
-      result = dplyr::bind_rows(result)
+      result <- dplyr::bind_rows(result)
       stopCluster(cl)
       
-      colnames(result) <- c("Protein",
-                            "Start_pos",
-                            "End_pos",
-                            "Length",
-                            "Probability",
-                            "Sequence",
-                            "pair_align_score",
-                            "Info_peptide",
-                            "Info_PepID")
+      colnames(result) <- c('Protein',
+                            'Start_pos',
+                            'End_pos',
+                            'Length',
+                            'Probability',
+                            'Sequence',
+                            'pair_align_score',
+                            'Info_peptide',
+                            'Info_PepID')
       
-      print("Writing result to the file...")
+      print('Writing result to the file...')
       
       output_file_name <- paste('./output/predictions_pairwiseAlignment_', 
                                 organism_data[1], '_', 
                                 substitution_matrix, '_', 
                                 pairwise_align_type, '_', 
                                 Sys.time(), sep='')
-      output_file_name <- gsub(' ', '_', output_file_name, fixed = TRUE)
-      output_file_name <- gsub(':', '_', output_file_name, fixed = TRUE)
+      output_file_name <- gsub(' ', '_', output_file_name, fixed=TRUE)
+      output_file_name <- gsub(':', '_', output_file_name, fixed=TRUE)
       
       write.csv(result,
                 paste(output_file_name, '.csv', sep=''), 
-                row.names = FALSE)
+                row.names=FALSE)
       
       ## persist histogram in file
       #png(paste(output_file_name, '.png', sep=''))
@@ -204,13 +214,13 @@ for (organism_data in organisms_data) {
   
   if (PLOT_SEQUENCE) {
     pl <- ggplot(data=df_complemented_negated, aes(x=Probability, y=pair_align_score)) +
-      ggtitle("PAM30") +
+      ggtitle(paste(organism_data[1], substitution_matrix, sep=' ')) +
       geom_point(aes(text=sprintf("Protein ID: %s Sequence: %s<br>Info_PepID: %s Info_peptide: %s", 
                                   Protein, Sequence, 
                                   Info_PepID, Info_peptide)))
   } else {
     pl <- ggplot(data=df_complemented_negated, aes(x=Probability, y=pair_align_score)) +
-      ggtitle("PAM30") +
+      ggtitle(paste(organism_data[1], substitution_matrix, sep=' ')) +
       geom_point(aes(text=sprintf("Protein ID: %s <br>Info_PepID: %s", 
                                   Protein, 
                                   Info_PepID)))
@@ -240,5 +250,6 @@ for (organism_data in organisms_data) {
   
   chart <- ggplotly(pl) 
   
+  # Sane plot in interactive file
   htmlwidgets::saveWidget(chart, selfcontained=TRUE, paste(output_file_name, '.html', sep=''))
 }
