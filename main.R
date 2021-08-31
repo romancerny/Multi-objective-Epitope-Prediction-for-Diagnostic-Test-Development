@@ -31,9 +31,12 @@ library(Biostrings)
 ###############################
 
 organisms_data <- list(
-  c('01_EBV', './data/data sets/01_EBV/pred_peptides.rds','./data/data sets/01_EBV/epitopes_except_organism.rds'),
-  c('02_HepC', './data/data sets/02_HepC/pred_peptides.rds','./data/data sets/02_HepC/epitopes_except_organism.rds'),
-  c('03_Ovolvulus', './data/data sets/03_Ovolvulus/pred_peptides.rds','./data/data sets/03_Ovolvulus/epitopes_except_organism.rds')
+  c('01_EBV', './data/data sets/01_EBV/pred_peptides.rds',
+    './data/data sets/01_EBV/epitopes_except_organism.rds'),
+  c('02_HepC', './data/data sets/02_HepC/pred_peptides.rds',
+    './data/data sets/02_HepC/epitopes_except_organism.rds'),
+  c('03_Ovolvulus', './data/data sets/03_Ovolvulus/pred_peptides.rds',
+    './data/data sets/03_Ovolvulus/epitopes_except_organism.rds')
 )
 
 
@@ -250,6 +253,6 @@ for (organism_data in organisms_data) {
   
   chart <- ggplotly(pl) 
   
-  # Sane plot in interactive file
+  # Save plot in interactive file
   htmlwidgets::saveWidget(chart, selfcontained=TRUE, paste(output_file_name, '.html', sep=''))
 }
