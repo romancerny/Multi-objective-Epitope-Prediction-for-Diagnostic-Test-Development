@@ -1,5 +1,3 @@
 # Multi-objective Epitope Prediction for Diagnostic Test Development
 
-## Peptide (short string) Levenshtein Distance
-
-Levenshtein Distance calculation using paralelisation is available in 04_levenshtein_distance.R file.
+The final version of this project is runnable by executing main_max_max.R file.
